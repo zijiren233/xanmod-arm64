@@ -17,7 +17,7 @@ jobs:
 
       - name: Build
         run: |
-          bash build.sh
+          sudo bash build.sh
         env:
           XANMODVER: ${{ inputs.version }}
 
