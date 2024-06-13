@@ -17,9 +17,8 @@ jobs:
 
       - name: Build
         run: |
-          sudo bash build.sh
-        env:
-          XANMODVER: ${{ inputs.version }}
+          sudo bash build.sh \
+            --version=${{ inputs.version }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
