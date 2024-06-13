@@ -1,6 +1,24 @@
 #!/bin/bash
 set -e
 
+for i in "$@"; do
+    case ${i,,} in
+    --version=*)
+        XANMODVER="${i#*=}"
+        shift
+        ;;
+    --version)
+        echo "Please use '--${i#--}=' to assign value to option"
+        exit 1
+        ;;
+    -*)
+        echo "Unknown option $i"
+        exit 1
+        ;;
+    *) ;;
+    esac
+done
+
 if [ -z "${XANMODVER}" ]; then
     echo "XANMODVER is not set"
     exit 1
