@@ -23,7 +23,7 @@ tar -zxf "linux-${XANMODVER}-xanmod1.tar.gz" \
     --strip-components=1
 cd linux-${XANMODVER}-kernel
 
-cp configs/config-6.6.13+bpo-arm64 .config
+cp ../configs/config-6.6.13+bpo-arm64 .config
 
 scripts/config --set-str CONFIG_LOCALVERSION '-arm64'
 

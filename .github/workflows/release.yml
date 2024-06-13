@@ -31,4 +31,4 @@ jobs:
           name: "Version ${{ inputs.version }}"
           tag_name: "${{ inputs.version }}"
           files: |
-            debs/*
+            linux-${{ inputs.version }}-kernel/debs/*
