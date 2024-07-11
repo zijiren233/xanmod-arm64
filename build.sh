@@ -19,12 +19,10 @@ for i in "$@"; do
     esac
 done
 
-if [ -z "${XANMODVER}" ]; then
-    echo "XANMODVER is not set"
+if [[ ! ${XANMODVER} =~ ^[0-9]+\.[0-9]+\.[0-9]+-xanmod[0-9]+$ ]]; then
+    echo "XANMODVER is not in format 'x.y.z-xanmodN'"
     exit 1
 fi
-
-XANMODVER="${XANMODVER%-xanmod1}"
 
 echo "xanmod version: ${XANMODVER}"
 
@@ -34,11 +32,11 @@ apt update &&
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio
 
-rm -rf linux-${XANMODVER}-xanmod1.tar.gz
-wget https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}-xanmod1/linux-${XANMODVER}-xanmod1.tar.gz
+rm -rf linux-${XANMODVER}.tar.gz
+wget https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz
 mkdir -p linux-${XANMODVER}-kernel
 rm -rf linux-${XANMODVER}-kernel/*
-tar -zxf "linux-${XANMODVER}-xanmod1.tar.gz" \
+tar -zxf "linux-${XANMODVER}.tar.gz" \
     -C linux-${XANMODVER}-kernel \
     --strip-components=1
 cd linux-${XANMODVER}-kernel
@@ -82,10 +80,10 @@ echo "release deb"
 $MAKE bindeb-pkg
 
 mkdir -p debs
-
 rm -rf debs/*
 
-mv ../linux-headers-${XANMODVER}*.deb debs
-mv ../linux-image-${XANMODVER}*.deb debs
-mv ../linux-libc-dev_${XANMODVER}*.deb debs
-mv ../linux-upstream_${XANMODVER}*.buildinfo debs
+VER=${XANMODVER%-*}-arm64-${XANMODVER#*-}
+mv ../linux-headers-${VER}*.deb debs
+mv ../linux-image-${VER}*.deb debs
+mv ../linux-libc-dev_${VER}*.deb debs
+mv ../linux-upstream_${VER}*.buildinfo debs
