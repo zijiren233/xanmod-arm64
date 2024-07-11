@@ -51,18 +51,11 @@ jobs:
           github_tags: ${{ steps.get_github_tags.outputs.result }}
 
   build_missing_releases:
-    name: Build Missing Releases
     needs: check_releases
-    runs-on: ubuntu-latest
     if: ${{ needs.check_releases.outputs.missing_tags != '[]' }}
+    uses: ./.github/workflows/release.yml
     strategy:
       matrix:
         tag: ${{ fromJson(needs.check_releases.outputs.missing_tags) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Trigger Release Workflow
-        uses: ./.github/workflows/release.yml
-        with:
-          version: ${{ matrix.tag }}
+    with:
+      version: ${{ matrix.tag }}
