@@ -42,7 +42,7 @@ jobs:
             const githubTags = JSON.parse(`${github_tags}`);
 
             const missingTags = xanmodTags
-              .map(release => release.tag_name.replace(/-xanmod1$/, ''))
+              .map(release => release.replace(/-xanmod1$/, ''))
               .filter(tag => !githubTags.includes(tag));
 
             return missingTags;
