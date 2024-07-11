@@ -65,6 +65,10 @@ scripts/config --disable CONFIG_MODULE_SIG_SHA256
 scripts/config --disable CONFIG_MODULE_SIG_SHA384
 scripts/config --disable CONFIG_MODULE_SIG_SHA512
 
+# BBR
+scripts/config --set-val CONFIG_TCP_CONG_BBR y
+scripts/config --set-str CONFIG_DEFAULT_TCP_CONG BBR
+
 MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1"
 
 $MAKE olddefconfig
