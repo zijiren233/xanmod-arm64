@@ -26,11 +26,15 @@ fi
 
 echo "xanmod version: ${XANMODVER}"
 
+clang --version
+
 apt update &&
     apt install -y wget make clang llvm lld \
         flex bison libncurses-dev perl libssl-dev:native \
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio
+
+clang --version
 
 rm -rf "linux-${XANMODVER}.tar.gz"
 wget "https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz"
