@@ -93,7 +93,7 @@ mkdir -p debs
 rm -rf debs/*
 
 VER="${XANMODVER%-xanmod*}"
-mv ../linux-headers-${VER}-arm64*.deb debs
-mv ../linux-image-${VER}-arm64*.deb debs
-mv ../linux-libc-dev_${VER}-arm64*.deb debs
-mv ../linux-upstream_${VER}-arm64*.buildinfo debs
+mv ../linux-headers-${VER}*.deb debs
+mv ../linux-image-${VER}*.deb debs
+mv ../linux-libc-dev_${VER}*.deb debs
+mv ../linux-upstream_${VER}*.buildinfo debs
