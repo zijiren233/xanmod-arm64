@@ -24,6 +24,8 @@ if [ -z "${XANMODVER}" ]; then
     exit 1
 fi
 
+XANMODVER="${XANMODVER%-xanmod1}"
+
 echo "xanmod version: ${XANMODVER}"
 
 apt update &&

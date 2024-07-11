@@ -6,6 +6,8 @@ on:
       version:
         description: "Version to release"
         required: true
+  repository_dispatch:
+    types: [release-event]
 
 jobs:
   release:
@@ -18,7 +20,7 @@ jobs:
       - name: Build
         run: |
           sudo bash build.sh \
-            --version=${{ inputs.version }}
+            --version=${{ github.event.client_payload.version || inputs.version }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -27,7 +29,7 @@ jobs:
           draft: false
           append_body: false
           fail_on_unmatched_files: true
-          name: "Version ${{ inputs.version }}"
-          tag_name: "${{ inputs.version }}"
+          name: "Version ${{ github.event.client_payload.version || inputs.version }}"
+          tag_name: "${{ github.event.client_payload.version || inputs.version }}"
           files: |
-            linux-${{ inputs.version }}-kernel/debs/*
+            linux-${{ github.event.client_payload.version || inputs.version }}-kernel/debs/*

@@ -1,0 +1,74 @@
+name: Daily Release Check and Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  check_releases:
+    name: Check for Missing Releases
+    runs-on: ubuntu-latest
+    outputs:
+      missing_tags: ${{ steps.filter_tags.outputs.result }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get GitLab Releases
+        id: get_gitlab_releases
+        uses: indiesdev/curl@v1.1
+        with:
+          url: https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc
+          accept: 200
+
+      - name: Get Existing GitHub Tags
+        id: get_github_tags
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tags = await github.rest.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            return tags.data.map(tag => tag.name);
+
+      - name: Filter Missing Tags
+        id: filter_tags
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const gitlabReleases = JSON.parse(context.inputs.gitlab_releases);
+            const githubTags = context.inputs.github_tags;
+
+            const missingTags = gitlabReleases
+              .filter(release => !githubTags.includes(release.tag_name))
+              .map(release => release.tag_name);
+
+            return missingTags;
+        env:
+          gitlab_releases: ${{ steps.get_gitlab_releases.outputs.response }}
+          github_tags: ${{ steps.get_github_tags.outputs.result }}
+
+  build_missing_releases:
+    name: Build Missing Releases
+    needs: check_releases
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_releases.outputs.missing_tags != '[]' }}
+    strategy:
+      matrix:
+        tag: ${{ fromJson(needs.check_releases.outputs.missing_tags) }}
+    steps:
+      - name: Trigger Release Workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'release-event',
+              client_payload: { 
+                version: '${{ matrix.tag }}' 
+              }
+            });
