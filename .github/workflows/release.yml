@@ -35,7 +35,7 @@ jobs:
         run: |
           sudo bash build.sh \
             --version=${{ inputs.version }} \
-            --clang=${{ env.LLVM_PATH }}
+            --llvm=${{ env.LLVM_PATH }}
         env:
           LLVM_PATH: ${{ env.LLVM_PATH }}
 
