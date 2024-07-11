@@ -15,10 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Remove Descriptions from GitLab Releases
-        id: remove_descriptions
+      - name: Get Xanmod tags
+        id: get_xanmod_tags
         run: |
-            echo "::set-output name=filtered_releases::$(curl "https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc" -sL | jq 'map({tag_name})')"
+            echo "::set-output name=xanmod_tags::$(curl "https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc" -sL | jq 'map(.tag_name)')"
 
       - name: Get Existing GitHub Tags
         id: get_github_tags
@@ -37,16 +37,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const gitlabReleases = JSON.parse(context.inputs.gitlab_releases);
-            const githubTags = context.inputs.github_tags;
+            const { xanmod_tags, github_tags } = process.env
+            const xanmodTags = JSON.parse(`${xanmod_tags}`);
+            const githubTags = JSON.parse(`${github_tags}`);
 
-            const missingTags = gitlabReleases
+            const missingTags = xanmodTags
               .map(release => release.tag_name.replace(/-xanmod1$/, ''))
               .filter(tag => !githubTags.includes(tag));
 
             return missingTags;
         env:
-          gitlab_releases: ${{ steps.remove_descriptions.outputs.filtered_releases }}
+          xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
           github_tags: ${{ steps.get_github_tags.outputs.result }}
 
   build_missing_releases:
