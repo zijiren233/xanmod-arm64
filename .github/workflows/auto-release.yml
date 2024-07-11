@@ -65,6 +65,7 @@ jobs:
     if: ${{ needs.check_releases.outputs.missing_tags != '[]' }}
     uses: ./.github/workflows/release.yml
     strategy:
+      fail-fast: false
       matrix:
         tag: ${{ fromJson(needs.check_releases.outputs.missing_tags) }}
     with:
