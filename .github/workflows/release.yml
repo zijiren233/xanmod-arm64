@@ -28,7 +28,7 @@ jobs:
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@master
         with:
-          version: 18
+          version: 18.1.4
 
       - name: Build
         run: |
