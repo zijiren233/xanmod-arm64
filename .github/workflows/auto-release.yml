@@ -25,9 +25,7 @@ jobs:
 
       - name: Remove Descriptions from GitLab Releases
         id: remove_descriptions
-        uses: bash-script@v1
-        with:
-          script: |
+        run: |
             echo "::set-output name=filtered_releases::$(echo '${{ steps.get_gitlab_releases.outputs.response }}' | jq 'map({name, tag_name})')"
 
       - name: Get Existing GitHub Tags
