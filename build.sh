@@ -19,8 +19,8 @@ for i in "$@"; do
     esac
 done
 
-if [[ ! ${XANMODVER} =~ ^[0-9]+\.[0-9]+\.[0-9]+-xanmod[0-9]+$ ]]; then
-    echo "XANMODVER is not in format 'x.y.z-xanmodN'"
+if [[ ! ${XANMODVER} =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9]+)*-xanmod[0-9]+$ ]]; then
+    echo "XANMODVER is not in format 'x.y.z(-something)-xanmodN'"
     exit 1
 fi
 
@@ -32,14 +32,14 @@ apt update &&
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio
 
-rm -rf linux-${XANMODVER}.tar.gz
-wget https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz
-mkdir -p linux-${XANMODVER}-kernel
-rm -rf linux-${XANMODVER}-kernel/*
+rm -rf "linux-${XANMODVER}.tar.gz"
+wget "https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz"
+mkdir -p "linux-${XANMODVER}-kernel"
+rm -rf "linux-${XANMODVER}-kernel/*"
 tar -zxf "linux-${XANMODVER}.tar.gz" \
-    -C linux-${XANMODVER}-kernel \
+    -C "linux-${XANMODVER}-kernel" \
     --strip-components=1
-cd linux-${XANMODVER}-kernel
+cd "linux-${XANMODVER}-kernel"
 
 cp ../configs/config-6.6.13+bpo-arm64 .config
 
@@ -82,8 +82,8 @@ $MAKE bindeb-pkg
 mkdir -p debs
 rm -rf debs/*
 
-VER=${XANMODVER%-*}-arm64-${XANMODVER#*-}
-mv ../linux-headers-${VER}*.deb debs
-mv ../linux-image-${VER}*.deb debs
-mv ../linux-libc-dev_${VER}*.deb debs
-mv ../linux-upstream_${VER}*.buildinfo debs
+VER="${XANMODVER%-xanmod*}"
+mv ../"linux-headers-${VER}-arm64*.deb" debs
+mv ../"linux-image-${VER}-arm64*.deb" debs
+mv ../"linux-libc-dev_${VER}-arm64*.deb" debs
+mv ../"linux-upstream_${VER}-arm64*.buildinfo" debs
