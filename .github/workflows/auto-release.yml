@@ -25,12 +25,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const tags = await github.rest.repos.listTags({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100,
-            });
-            return tags.data.map(tag => tag.name);
+            let allTags = [];
+            let page = 1;
+            let hasNextPage = true;
+
+            while (hasNextPage) {
+              const response = await github.rest.repos.listTags({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+                page: page,
+              });
+              allTags = allTags.concat(response.data.map(tag => tag.name));
+              hasNextPage = response.data.length === 100;
+              page++;
+            }
+
+            return allTags;
 
       - name: Filter Missing Tags
         id: filter_tags
