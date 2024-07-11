@@ -29,11 +29,15 @@ jobs:
         uses: KyleMayes/install-llvm-action@master
         with:
           version: 17
+          directory: ${{ runner.temp }}/llvm
 
       - name: Build
         run: |
           sudo bash build.sh \
-            --version=${{ inputs.version }}
+            --version=${{ inputs.version }} \
+            --clang=${{ env.LLVM_PATH }}
+        env:
+          LLVM_PATH: ${{ env.LLVM_PATH }}
 
       - name: Release
         uses: softprops/action-gh-release@v2

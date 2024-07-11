@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+LLVM=1
+
 for i in "$@"; do
     case ${i,,} in
     --version=*)
@@ -8,6 +10,14 @@ for i in "$@"; do
         shift
         ;;
     --version)
+        echo "Please use '--${i#--}=' to assign value to option"
+        exit 1
+        ;;
+    --llvm=*)
+        LLVM="${i#*=}"
+        shift
+        ;;
+    --llvm)
         echo "Please use '--${i#--}=' to assign value to option"
         exit 1
         ;;
@@ -26,15 +36,11 @@ fi
 
 echo "xanmod version: ${XANMODVER}"
 
-clang --version
-
 apt update &&
     apt install -y wget make clang llvm lld \
         flex bison libncurses-dev perl libssl-dev:native \
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio
-
-clang --version
 
 rm -rf "linux-${XANMODVER}.tar.gz"
 wget "https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz"
@@ -73,7 +79,7 @@ scripts/config --disable CONFIG_MODULE_SIG_SHA512
 scripts/config --set-val CONFIG_TCP_CONG_BBR y
 scripts/config --set-str CONFIG_DEFAULT_TCP_CONG BBR
 
-MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1"
+MAKE="make -j$(nproc) ARCH=arm64 LLVM=${LLVM} LLVM_IAS=1"
 
 $MAKE olddefconfig
 
