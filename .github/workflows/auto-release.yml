@@ -15,18 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get GitLab Releases
-        id: get_gitlab_releases
-        uses: indiesdev/curl@v1.1
-        with:
-          url: https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc
-          accept: 200
-          timeout: 15000
-
       - name: Remove Descriptions from GitLab Releases
         id: remove_descriptions
         run: |
-            echo "::set-output name=filtered_releases::$(echo '${{ steps.get_gitlab_releases.outputs.response }}' | jq 'map({name, tag_name})')"
+            echo "::set-output name=filtered_releases::$(curl "https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc" -sL | jq 'map({tag_name})')"
 
       - name: Get Existing GitHub Tags
         id: get_github_tags
@@ -49,8 +41,8 @@ jobs:
             const githubTags = context.inputs.github_tags;
 
             const missingTags = gitlabReleases
-              .filter(release => !githubTags.includes(release.tag_name))
-              .map(release => release.tag_name);
+              .map(release => release.tag_name.replace(/-xanmod1$/, ''))
+              .filter(tag => !githubTags.includes(tag));
 
             return missingTags;
         env:
