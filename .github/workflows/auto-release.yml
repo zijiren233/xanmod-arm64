@@ -18,7 +18,7 @@ jobs:
       - name: Get Xanmod tags
         id: get_xanmod_tags
         run: |
-            echo "::set-output name=xanmod_tags::$(curl "https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc" -sL | jq 'map(.tag_name)')"
+            echo "::set-output name=xanmod_tags::\"$(curl 'https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc' -sL | jq 'map(.tag_name)')\""
 
       - name: Get Existing GitHub Tags
         id: get_github_tags
