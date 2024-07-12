@@ -92,7 +92,7 @@ $MAKE bindeb-pkg
 mkdir -p debs
 rm -rf debs/*
 
-VER="${XANMODVER%-xanmod*}"
+VER=$(echo ${XANMODVER} | cut -d- -f1)
 mv ../linux-headers-${VER}*.deb debs
 mv ../linux-image-${VER}*.deb debs
 mv ../linux-libc-dev_${VER}*.deb debs
