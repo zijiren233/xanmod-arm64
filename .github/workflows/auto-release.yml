@@ -71,7 +71,9 @@ jobs:
           script: |
             const { xanmod_tags, LTS } = process.env
             const xanmodTags = JSON.parse(`${xanmod_tags}`);
-            const ltsTags = xanmodTags.filter(tag => tag.startsWith(`${LTS}`);
+            const ltsTags = xanmodTags
+              .filter(tag => tag.startsWith(`${LTS}`))
+              .filter(tag => !tag.includes('rt'));
             return ltsTags.length > 0 ? ltsTags[0] : null;
         env:
           xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
