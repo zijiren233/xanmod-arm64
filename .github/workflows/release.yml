@@ -7,12 +7,22 @@ on:
         description: "Version to release"
         type: string
         required: true
+      latest:
+        description: "Make this version the latest LTS"
+        type: boolean
+        default: false
+        required: false
   workflow_call:
     inputs:
       version:
         description: "Version to release"
         type: string
         required: true
+      latest:
+        description: "Make this version the latest LTS"
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   release:
@@ -48,5 +58,6 @@ jobs:
           fail_on_unmatched_files: true
           name: "Version ${{ inputs.version }}"
           tag_name: "${{ inputs.version }}"
+          make_latest: ${{ inputs.latest }}
           files: |
             linux-${{ inputs.version }}-kernel/debs/*

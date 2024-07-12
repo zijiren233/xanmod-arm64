@@ -5,12 +5,16 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+env:
+  LTS: 6.6.
+
 jobs:
   check_releases:
     name: Check for Missing Releases
     runs-on: ubuntu-latest
     outputs:
       missing_tags: ${{ steps.filter_tags.outputs.result }}
+      lts: ${{ steps.latest_lts.outputs.result }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,7 +22,7 @@ jobs:
       - name: Get Xanmod tags
         id: get_xanmod_tags
         run: |
-            echo "::set-output name=xanmod_tags::$(curl 'https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc' -sL | jq -c 'map(.tag_name)')"
+          echo "::set-output name=xanmod_tags::$(curl 'https://gitlab.com/api/v4/projects/xanmod%2Flinux/releases?per_page=100&order_by=created_at&sort=desc' -sL | jq -c 'map(.tag_name)')"
 
       - name: Get Existing GitHub Tags
         id: get_github_tags
@@ -60,6 +64,18 @@ jobs:
           xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
           github_tags: ${{ steps.get_github_tags.outputs.result }}
 
+      - name: Determine Latest LTS
+        id: latest_lts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { xanmod_tags, LTS } = process.env
+            const xanmodTags = JSON.parse(`${xanmod_tags}`);
+            const ltsTags = xanmodTags.filter(tag => tag.startsWith(`${LTS}`);
+            return ltsTags.length > 0 ? ltsTags[0] : null;
+        env:
+          xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
+
   build_missing_releases:
     needs: check_releases
     if: ${{ needs.check_releases.outputs.missing_tags != '[]' }}
@@ -70,3 +86,4 @@ jobs:
         tag: ${{ fromJson(needs.check_releases.outputs.missing_tags) }}
     with:
       version: ${{ matrix.tag }}
+      latest: ${{ matrix.tag == needs.check_releases.outputs.lts }}
