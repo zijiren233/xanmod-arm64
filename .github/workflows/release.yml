@@ -49,6 +49,9 @@ jobs:
         env:
           LLVM_PATH: ${{ env.LLVM_PATH }}
 
+      - run: |
+          echo "${{ inputs.latest }}"
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:

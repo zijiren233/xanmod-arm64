@@ -68,6 +68,7 @@ jobs:
         id: latest_lts
         uses: actions/github-script@v7
         with:
+          result-encoding: string
           script: |
             const { xanmod_tags, LTS } = process.env
             const xanmodTags = JSON.parse(`${xanmod_tags}`);
