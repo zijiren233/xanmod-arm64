@@ -44,11 +44,8 @@ jobs:
 
       - name: Build
         run: |
-          sudo bash build.sh \
-            --version=${{ inputs.version }} \
-            --llvm=${{ env.LLVM_PATH }}/bin/
-        env:
-          LLVM_PATH: ${{ env.LLVM_PATH }}
+          sudo PATH=${{ env.LLVM_PATH }}/bin:$PATH bash build.sh \
+            --version=${{ inputs.version }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
