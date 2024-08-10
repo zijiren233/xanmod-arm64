@@ -31,6 +31,10 @@ apt update &&
         flex bison libncurses-dev perl libssl-dev:native \
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio
+if ! command -v rustup >/dev/null 2>&1; then
+    curl https://sh.rustup.rs -sSf | bash -s -- -y
+fi
+rustup default stable
 
 rm -rf "linux-${XANMODVER}.tar.gz"
 wget "https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.tar.gz"
