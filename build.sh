@@ -15,6 +15,7 @@ for i in "$@"; do
         ;;
     --llvm=*)
         LLVM="${i#*=}"
+        tree $LLVM
         shift
         ;;
     --llvm)
@@ -80,6 +81,8 @@ scripts/config --set-val CONFIG_TCP_CONG_BBR y
 scripts/config --set-str CONFIG_DEFAULT_TCP_CONG BBR
 
 MAKE="make -j$(nproc) ARCH=arm64 LLVM=${LLVM} LLVM_IAS=1"
+
+echo "MAKE: $MAKE"
 
 $MAKE olddefconfig
 
