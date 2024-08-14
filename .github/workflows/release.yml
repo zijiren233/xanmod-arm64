@@ -39,7 +39,7 @@ jobs:
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@master
         with:
-          version: 17
+          version: 18
           directory: ${{ runner.temp }}/llvm
 
       - name: Build

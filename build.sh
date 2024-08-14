@@ -73,7 +73,7 @@ scripts/config --disable CONFIG_MODULE_SIG_SHA512
 scripts/config --set-val CONFIG_TCP_CONG_BBR y
 scripts/config --set-str CONFIG_DEFAULT_TCP_CONG BBR
 
-MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1"
+MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1 KCFLAGS="-pipe""
 
 echo "make: $MAKE"
 
