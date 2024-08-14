@@ -45,7 +45,11 @@ tar -zxf "linux-${XANMODVER}.tar.gz" \
     --strip-components=1
 cd "linux-${XANMODVER}-kernel"
 
-cp ../configs/config-6.6.13+bpo-arm64 .config
+if [[ ${XANMODVER} =~ -rt ]]; then
+    cp ../configs/config-6.9.7+bpo-rt-arm64 .config
+else
+    cp ../configs/config-6.9.7+bpo-arm64 .config
+fi
 
 scripts/config --set-str CONFIG_LOCALVERSION '-arm64'
 
