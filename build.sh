@@ -30,7 +30,7 @@ apt update &&
     apt install -y wget make clang llvm lld \
         flex bison libncurses-dev perl libssl-dev:native \
         libelf-dev:native build-essential lsb-release \
-        bc debhelper rsync kmod cpio
+        bc debhelper rsync kmod cpio libtinfo5
 if ! command -v rustup >/dev/null 2>&1; then
     curl https://sh.rustup.rs -sSf | bash -s -- -y
 fi
