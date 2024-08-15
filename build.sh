@@ -107,7 +107,8 @@ enable "CPU_FREQ_DEFAULT_GOV_PERFORMANCE" "CPU_FREQ_DEFAULT_GOV_PERFORMANCE_NODE
 scripts/config --set-str CONFIG_SYSTEM_TRUSTED_KEYS ''
 scripts/config --set-str CONFIG_SYSTEM_REVOCATION_KEYS ''
 
-scripts/config --disable CONFIG_DEBUG_INFO_BTF # then no need dwarves
+# then no need dwarves
+disable DEBUG_INFO_BTF
 
 # LTO
 disable LTO_CLANG_FULL
@@ -115,12 +116,12 @@ enable LTO_CLANG_THIN
 disable LTO_NONE
 
 # MODULE SIG SHA1
-scripts/config --set-val CONFIG_MODULE_SIG_SHA1 y
 scripts/config --set-str CONFIG_MODULE_SIG_HASH sha1
-scripts/config --disable CONFIG_MODULE_SIG_SHA224
-scripts/config --disable CONFIG_MODULE_SIG_SHA256
-scripts/config --disable CONFIG_MODULE_SIG_SHA384
-scripts/config --disable CONFIG_MODULE_SIG_SHA512
+enable MODULE_SIG_SHA1
+disable MODULE_SIG_SHA224
+disable MODULE_SIG_SHA256
+disable MODULE_SIG_SHA384
+disable MODULE_SIG_SHA512
 
 # bbr
 enable "TCP_CONG_ADVANCED"
@@ -133,7 +134,7 @@ done
 enable "DEFAULT_BBR"
 scripts/config --set-str "DEFAULT_TCP_CONG" "bbr"
 
-MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1 KCFLAGS="-pipe""
+MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1 INSTALL_MOD_STRIP=1 KCFLAGS="-pipe""
 
 echo "make: $MAKE"
 
