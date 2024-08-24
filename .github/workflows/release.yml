@@ -47,6 +47,12 @@ jobs:
           sudo PATH=${{ env.LLVM_PATH }}/bin:$PATH bash build.sh \
             --version=${{ inputs.version }}
 
+      - name: Get Release Body from Xanmod
+        id: get_xanmod_release_body
+        run: |
+          body_html=$(curl -sL "https://api.github.com/repos/xanmod/linux/releases/tags/${{ inputs.version }}" -H "Accept: application/vnd.github.html+json" | jq -r '.body_html')
+          echo "::set-output name=body_html::$body_html"
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
@@ -57,5 +63,6 @@ jobs:
           name: "Version ${{ inputs.version }}"
           tag_name: "${{ inputs.version }}"
           make_latest: ${{ inputs.latest }}
+          body: ${{ steps.get_xanmod_release_body.outputs.body_html }}
           files: |
             linux-${{ inputs.version }}-kernel/debs/*

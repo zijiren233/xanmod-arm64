@@ -5,9 +5,6 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
-env:
-  LTS: 6.6.
-
 jobs:
   check_releases:
     name: Check for Missing Releases
@@ -64,6 +61,11 @@ jobs:
           xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
           github_tags: ${{ steps.get_github_tags.outputs.result }}
 
+      - name: Get Latest LTS Kernel Version
+        id: get_latest_lts_kernel
+        run: |
+          echo "::set-output name=result::$(curl -sL https://www.kernel.org/releases.html | egrep -o '<td>[0-9]+\.[0-9]+</td>' | head -1 | egrep -o '[0-9]+\.[0-9]+')"
+
       - name: Determine Latest LTS
         id: latest_lts
         uses: actions/github-script@v7
@@ -73,12 +75,12 @@ jobs:
             const { xanmod_tags, LTS } = process.env
             const xanmodTags = JSON.parse(`${xanmod_tags}`);
             const ltsTags = xanmodTags
-              .filter(tag => tag.startsWith(`${LTS}`))
+              .filter(tag => tag.startsWith(`${LTS}.`))
               .filter(tag => !tag.includes('rt'));
             return ltsTags.length > 0 ? ltsTags[0] : null;
         env:
           xanmod_tags: ${{ steps.get_xanmod_tags.outputs.xanmod_tags }}
-          LTS: ${{ env.LTS }}
+          LTS: ${{ steps.get_latest_lts_kernel.outputs.result }}
 
   build_missing_releases:
     needs: check_releases
