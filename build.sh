@@ -13,6 +13,7 @@ for i in "$@"; do
         ;;
     --ccache)
         USE_CCACHE=true
+        export KBUILD_BUILD_TIMESTAMP=''
         shift
         ;;
     -*)
