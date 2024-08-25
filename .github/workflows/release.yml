@@ -40,7 +40,7 @@ jobs:
         id: get_xanmod_release_body
         run: |
           body_html=$(curl -sL "https://api.github.com/repos/xanmod/linux/releases/tags/${{ inputs.version }}" -H "Accept: application/vnd.github.html+json" | jq -r '.body_html')
-          echo "::set-output name=body_html::$body_html"
+          echo "$$body_html" > body-${{ inputs.version }}.html
 
       # - name: Install LLVM and Clang
       #   uses: KyleMayes/install-llvm-action@master
@@ -63,7 +63,6 @@ jobs:
           name: "Version ${{ inputs.version }}"
           tag_name: "${{ inputs.version }}"
           make_latest: ${{ inputs.latest }}
-          body: |
-            "${{ steps.get_xanmod_release_body.outputs.body_html }}"
+          body_path: body-${{ inputs.version }}.html
           # files: |
           #   linux-${{ inputs.version }}-kernel/debs/*
