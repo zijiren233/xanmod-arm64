@@ -41,16 +41,16 @@ jobs:
         run: |
           curl -sL "https://api.github.com/repos/xanmod/linux/releases/tags/${{ inputs.version }}" -H "Accept: application/vnd.github.html+json" | jq -r '.body_html' > body-${{ inputs.version }}.html
 
-      # - name: Install LLVM and Clang
-      #   uses: KyleMayes/install-llvm-action@master
-      #   with:
-      #     version: 18
-      #     directory: ${{ runner.temp }}/llvm
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@master
+        with:
+          version: 18
+          directory: ${{ runner.temp }}/llvm
 
-      # - name: Build
-      #   run: |
-      #     sudo PATH=${{ env.LLVM_PATH }}/bin:$PATH bash build.sh \
-      #       --version=${{ inputs.version }}
+      - name: Build
+        run: |
+          sudo PATH=${{ env.LLVM_PATH }}/bin:$PATH bash build.sh \
+            --version=${{ inputs.version }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -63,5 +63,5 @@ jobs:
           tag_name: "${{ inputs.version }}"
           make_latest: ${{ inputs.latest }}
           body_path: body-${{ inputs.version }}.html
-          # files: |
-          #   linux-${{ inputs.version }}-kernel/debs/*
+          files: |
+            linux-${{ inputs.version }}-kernel/debs/*
