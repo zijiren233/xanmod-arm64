@@ -64,6 +64,6 @@ jobs:
           tag_name: "${{ inputs.version }}"
           make_latest: ${{ inputs.latest }}
           body: |
-            ${{ steps.get_xanmod_release_body.outputs.body_html }}
+            "${{ steps.get_xanmod_release_body.outputs.body_html }}"
           # files: |
           #   linux-${{ inputs.version }}-kernel/debs/*
