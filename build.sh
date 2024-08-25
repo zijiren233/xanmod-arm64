@@ -11,6 +11,10 @@ for i in "$@"; do
         echo "Please use '--${i#--}=' to assign value to option"
         exit 1
         ;;
+    --ccache)
+        USE_CCACHE=true
+        shift
+        ;;
     -*)
         echo "Unknown option $i"
         exit 1
@@ -31,7 +35,10 @@ apt update &&
         flex bison libncurses-dev perl libssl-dev:native \
         libelf-dev:native build-essential lsb-release \
         bc debhelper rsync kmod cpio libtinfo5
+. "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
+    # export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
+    # export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
     curl https://sh.rustup.rs -sSf | bash -s -- -y
     . "$HOME/.cargo/env"
 fi
@@ -151,11 +158,13 @@ LLVM=1 LLVM_IAS=1 \
 INSTALL_PATH=$INSTALL_DIR/boot \
 INSTALL_MOD_PATH=$INSTALL_DIR \
 INSTALL_MOD_STRIP=1 \
+INSTALL_HDR_PATH=$INSTALL_DIR \
 LOCALVERSION=$LOCALVERSION EXTRAVERSION="" \
-KCFLAGS=-pipe \
+KCFLAGS=\"-pipe\" \
+${USE_CCACHE:+CC=\"ccache clang\"} \
 "
-
 echo "make: $MAKE"
+MAKE="eval $MAKE"
 
 echo "clang version: $(clang --version)"
 
@@ -169,14 +178,14 @@ echo "build done"
 $MAKE modules
 echo "build modules done"
 
-$MAKE install
-echo "install done"
+# $MAKE modules_install
+# echo "install modules done"
 
-$MAKE modules_install
-echo "install modules done"
+# $MAKE install
+# echo "install done"
 
-echo "making tarball ..."
-tar -czf "$TAR_PKG" boot/* lib/modules/* -C "$INSTALL_DIR" --owner=0 --group=0
+# echo "making tarball ..."
+# tar -czf "$TAR_PKG" boot/* lib/modules/* -C "$INSTALL_DIR" --owner=0 --group=0
 
 echo "release bindeb pkgs"
 $MAKE bindeb-pkg

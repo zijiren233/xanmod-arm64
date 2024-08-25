@@ -17,6 +17,7 @@ dpkg -i /tmp/xanmod/linux-*.deb
 rm -rf /tmp/xanmod
 ```
 
+<!--
 ## Other
 
 ```bash
@@ -35,3 +36,4 @@ done
 update-grub
 rm -rf /tmp/xanmod
 ```
+-->
