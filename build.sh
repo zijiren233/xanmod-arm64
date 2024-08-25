@@ -144,7 +144,7 @@ scripts/config --set-str "DEFAULT_TCP_CONG" "bbr"
 LOCALVERSION="-arm64"
 INSTALL_DIR="${PWD}/install"
 PKGS_DIR="${PWD}/pkgs"
-TAR_PKG="${PKGS_DIR}/kernel-${XANMODVER}${LOCALVERSION}.tar.gz2"
+TAR_PKG="${PKGS_DIR}/kernel-${XANMODVER}${LOCALVERSION}.tar.gz"
 
 mkdir -p ${INSTALL_DIR}
 rm -rf ${INSTALL_DIR}/*
@@ -179,20 +179,15 @@ echo "build done"
 $MAKE modules
 echo "build modules done"
 
-# $MAKE modules_install
-# echo "install modules done"
-
-# $MAKE install
-# echo "install done"
-
-# echo "making tarball ..."
-# tar -czf "$TAR_PKG" boot/* lib/modules/* -C "$INSTALL_DIR" --owner=0 --group=0
-
 echo "release bindeb pkgs"
 $MAKE bindeb-pkg
-
 VER=$(echo ${XANMODVER} | cut -d- -f1)
 mv ../linux-headers-${VER}*.deb $PKGS_DIR
 mv ../linux-image-${VER}*.deb $PKGS_DIR
 mv ../linux-libc-dev_${VER}*.deb $PKGS_DIR
 mv ../linux-upstream_${VER}*.buildinfo $PKGS_DIR
+mv ../linux-upstream_${VER}*.changes $PKGS_DIR
+
+echo "release tar.gz pkg"
+$MAKE targz-pkg
+mv linux-${VER}-arm64-xanmod1-arm64.tar.gz $TAR_PKG
