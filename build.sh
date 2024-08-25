@@ -75,8 +75,6 @@ module() {
     done
 }
 
-scripts/config --set-str CONFIG_LOCALVERSION '-arm64'
-
 # debug
 disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 disable DEBUG_INFO
@@ -134,7 +132,27 @@ done
 enable "DEFAULT_BBR"
 scripts/config --set-str "DEFAULT_TCP_CONG" "bbr"
 
-MAKE="make -j$(nproc) ARCH=arm64 LLVM=1 LLVM_IAS=1 INSTALL_MOD_STRIP=1 KCFLAGS="-pipe""
+LOCALVERSION="-arm64"
+INSTALL_DIR="${PWD}/install"
+PKGS_DIR="${PWD}/pkgs"
+TAR_PKG="${PKGS_DIR}/kernel-${XANMODVER}${LOCALVERSION}.tar.gz2"
+
+mkdir -p ${INSTALL_DIR}
+rm -rf ${INSTALL_DIR}/*
+mkdir -p ${INSTALL_DIR}/boot
+mkdir -p ${PKGS_DIR}
+rm -rf ${PKGS_DIR}/*
+
+MAKE="make \
+-j$(nproc) \
+ARCH=arm64 \
+LLVM=1 LLVM_IAS=1 \
+INSTALL_PATH=\"$INSTALL_DIR/boot\" \
+INSTALL_MOD_PATH=\"$INSTALL_DIR\" \
+INSTALL_MOD_STRIP=1 \
+LOCALVERSION="$LOCALVERSION" EXTRAVERSION="" \
+KCFLAGS=\"-pipe\" \
+"
 
 echo "make: $MAKE"
 
@@ -142,17 +160,25 @@ echo "clang version: $(clang --version)"
 
 $MAKE olddefconfig
 
+$MAKE prepare
+
 $MAKE
 echo "build done"
 
-echo "release deb"
+$MAKE modules
+
+$MAKE install
+
+$MAKE modules_install
+
+echo "making tarball ..."
+(cd "$INSTALL_DIR" && tar -czf "$TAR_PKG" boot/* lib/modules/* --owner=0 --group=0)
+
+echo "release bindeb pkgs"
 $MAKE bindeb-pkg
 
-mkdir -p debs
-rm -rf debs/*
-
 VER=$(echo ${XANMODVER} | cut -d- -f1)
-mv ../linux-headers-${VER}*.deb debs
-mv ../linux-image-${VER}*.deb debs
-mv ../linux-libc-dev_${VER}*.deb debs
-mv ../linux-upstream_${VER}*.buildinfo debs
+mv ../linux-headers-${VER}*.deb $PKGS_DIR
+mv ../linux-image-${VER}*.deb $PKGS_DIR
+mv ../linux-libc-dev_${VER}*.deb $PKGS_DIR
+mv ../linux-upstream_${VER}*.buildinfo $PKGS_DIR
