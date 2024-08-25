@@ -33,6 +33,7 @@ apt update &&
         bc debhelper rsync kmod cpio libtinfo5
 if ! command -v rustup >/dev/null 2>&1; then
     curl https://sh.rustup.rs -sSf | bash -s -- -y
+    . "$HOME/.cargo/env"
 fi
 rustup default stable
 
@@ -166,13 +167,16 @@ $MAKE
 echo "build done"
 
 $MAKE modules
+echo "build modules done"
 
 $MAKE install
+echo "install done"
 
 $MAKE modules_install
+echo "install modules done"
 
 echo "making tarball ..."
-(cd "$INSTALL_DIR" && tar -czf "$TAR_PKG" boot/* lib/modules/* --owner=0 --group=0)
+tar -czf "$TAR_PKG" boot/* lib/modules/* -C "$INSTALL_DIR" --owner=0 --group=0
 
 echo "release bindeb pkgs"
 $MAKE bindeb-pkg
