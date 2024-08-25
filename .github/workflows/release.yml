@@ -65,3 +65,4 @@ jobs:
           body_path: body-${{ inputs.version }}.html
           files: |
             linux-${{ inputs.version }}-kernel/pkgs/*
+            linux-${{ inputs.version }}.tar.gz
