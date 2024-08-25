@@ -33,4 +33,5 @@ for v in $(ls vmlinuz-* | sed s/vmlinuz-//g); do
     mkinitramfs -k -o initrd.img-${v} ${v}
 done
 update-grub
+rm -rf /tmp/xanmod
 ```
