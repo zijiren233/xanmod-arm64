@@ -190,4 +190,4 @@ mv ../linux-upstream_${VER}*.changes $PKGS_DIR
 
 echo "release tar.gz pkg"
 $MAKE targz-pkg
-mv linux-${VER}-arm64-xanmod1-arm64.tar.gz $TAR_PKG
+mv linux-${VER}*${LOCALVERSION}.tar.gz $TAR_PKG
