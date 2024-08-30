@@ -41,6 +41,16 @@ jobs:
         run: |
           curl -sL "https://api.github.com/repos/xanmod/linux/releases/tags/${{ inputs.version }}" -H "Accept: application/vnd.github.html+json" | jq -r '.body_html' > body-${{ inputs.version }}.html
 
+      - name: Truncate Release Body if Too Long
+        id: truncate_release_body
+        run: |
+          BODY_LENGTH=$(wc -c < body-${{ inputs.version }}.html)
+          if [[ $BODY_LENGTH -gt 125000 ]]; then
+            head -c 125000 body-${{ inputs.version }}.html > truncated-body-${{ inputs.version }}.html
+            echo "::warning:: Release body truncated to 125000 characters."
+            mv truncated-body-${{ inputs.version }}.html body-${{ inputs.version }}.html
+          fi
+
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@master
         with:
