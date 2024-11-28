@@ -33,9 +33,9 @@ echo "xanmod version: ${XANMODVER}"
 
 apt update &&
     apt install -y wget make clang llvm lld \
-        flex bison libncurses-dev perl libssl-dev:arm64 \
+        flex bison libncurses-dev perl libssl-dev \
         libelf-dev build-essential lsb-release \
-        bc debhelper rsync kmod cpio libtinfo5
+        bc debhelper rsync kmod cpio libtinfo5 gcc-aarch64-linux-gnu
 . "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
     # export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
