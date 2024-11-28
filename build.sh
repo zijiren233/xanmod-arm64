@@ -33,7 +33,7 @@ echo "xanmod version: ${XANMODVER}"
 
 apt update &&
     apt install -y wget make clang llvm lld \
-        flex bison libncurses-dev perl libssl-dev \
+        flex bison libncurses-dev perl libssl-dev:arm64 \
         libelf-dev build-essential lsb-release \
         bc debhelper rsync kmod cpio libtinfo5
 . "$HOME/.cargo/env" || true
@@ -154,9 +154,9 @@ mkdir -p ${INSTALL_DIR}/boot
 mkdir -p ${PKGS_DIR}
 rm -rf ${PKGS_DIR}/*
 
-export CC="clang"
+export CC="clang --target=aarch64-linux-gnu"
 if [[ ${USE_CCACHE} == true ]]; then
-    export CC="ccache clang"
+    export CC="ccache clang --target=aarch64-linux-gnu"
 fi
 
 MAKE="make \
