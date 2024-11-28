@@ -31,9 +31,11 @@ fi
 
 echo "xanmod version: ${XANMODVER}"
 
+dpkg --add-architecture arm64
+
 apt update &&
     apt install -y wget make clang llvm lld \
-        flex bison libncurses-dev perl libssl-dev \
+        flex bison libncurses-dev perl libssl-dev:arm64 \
         libelf-dev build-essential lsb-release \
         bc debhelper rsync kmod cpio libtinfo5 gcc-aarch64-linux-gnu
 . "$HOME/.cargo/env" || true
