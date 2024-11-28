@@ -141,6 +141,8 @@ done
 enable "DEFAULT_BBR"
 scripts/config --set-str "DEFAULT_TCP_CONG" "bbr"
 
+disable "VIRTIO_BALLOON"
+
 LOCALVERSION="-arm64"
 INSTALL_DIR="${PWD}/install"
 PKGS_DIR="${PWD}/pkgs"
