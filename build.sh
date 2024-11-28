@@ -33,8 +33,8 @@ echo "xanmod version: ${XANMODVER}"
 
 apt update &&
     apt install -y wget make clang llvm lld \
-        flex bison libncurses-dev perl libssl-dev:native \
-        libelf-dev:native build-essential lsb-release \
+        flex bison libncurses-dev perl libssl-dev \
+        libelf-dev build-essential lsb-release \
         bc debhelper rsync kmod cpio libtinfo5
 . "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
@@ -154,6 +154,11 @@ mkdir -p ${INSTALL_DIR}/boot
 mkdir -p ${PKGS_DIR}
 rm -rf ${PKGS_DIR}/*
 
+export CC="clang"
+if [[ ${USE_CCACHE} == true ]]; then
+    export CC="ccache clang"
+fi
+
 MAKE="make \
 -j$(nproc) \
 ARCH=arm64 \
@@ -164,7 +169,6 @@ INSTALL_MOD_STRIP=1 \
 INSTALL_HDR_PATH=$INSTALL_DIR \
 LOCALVERSION=$LOCALVERSION EXTRAVERSION="" \
 KCFLAGS=\"-pipe\" \
-${USE_CCACHE:+CC=\"ccache clang\"} \
 "
 echo "make: $MAKE"
 MAKE="eval $MAKE"
