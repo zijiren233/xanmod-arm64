@@ -176,7 +176,7 @@ KCFLAGS=\"-pipe\" \
 echo "make: $MAKE"
 MAKE="eval $MAKE"
 
-echo "aarch64-linux-gnu version: $(aarch64-linux-gnu-gcc -v)"
+echo "aarch64-linux-gnu-gcc version: $(aarch64-linux-gnu-gcc -v)"
 
 $MAKE olddefconfig
 
