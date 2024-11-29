@@ -34,10 +34,10 @@ echo "xanmod version: ${XANMODVER}"
 dpkg --add-architecture arm64
 
 apt update &&
-    apt install -y wget make clang llvm lld \
+    apt install -y wget make \
         flex bison libncurses-dev perl libssl-dev:arm64 \
-        libelf-dev build-essential lsb-release \
-        bc debhelper rsync kmod cpio libtinfo5 gcc-aarch64-linux-gnu
+        libelf-dev:arm64 libelf-dev:native libssl-dev:native build-essential lsb-release \
+        bc debhelper rsync kmod cpio debhelper-compat gcc-aarch64-linux-gnu
 . "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
     # export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
@@ -121,8 +121,8 @@ disable DEBUG_INFO_BTF
 
 # LTO
 disable LTO_CLANG_FULL
-enable LTO_CLANG_THIN
-disable LTO_NONE
+disable LTO_CLANG_THIN
+enable LTO_NONE
 
 # MODULE SIG SHA1
 scripts/config --set-str CONFIG_MODULE_SIG_HASH sha1
@@ -156,15 +156,14 @@ mkdir -p ${INSTALL_DIR}/boot
 mkdir -p ${PKGS_DIR}
 rm -rf ${PKGS_DIR}/*
 
-export CC="clang --target=aarch64-linux-gnu"
+export CC="aarch64-linux-gnu-gcc"
 if [[ ${USE_CCACHE} == true ]]; then
-    export CC="ccache clang --target=aarch64-linux-gnu"
+    export CC="ccache aarch64-linux-gnu-gcc"
 fi
 
 MAKE="make \
 -j$(nproc) \
 ARCH=arm64 \
-LLVM=1 LLVM_IAS=1 \
 INSTALL_PATH=$INSTALL_DIR/boot \
 INSTALL_MOD_PATH=$INSTALL_DIR \
 INSTALL_MOD_STRIP=1 \
@@ -175,7 +174,7 @@ KCFLAGS=\"-pipe\" \
 echo "make: $MAKE"
 MAKE="eval $MAKE"
 
-echo "clang version: $(clang --version)"
+echo "aarch64-linux-gnu version: $(aarch64-linux-gnu-gcc -v)"
 
 $MAKE olddefconfig
 
