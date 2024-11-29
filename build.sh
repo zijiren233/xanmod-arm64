@@ -156,8 +156,10 @@ mkdir -p ${INSTALL_DIR}/boot
 mkdir -p ${PKGS_DIR}
 rm -rf ${PKGS_DIR}/*
 
+export CROSS_COMPILE="aarch64-linux-gnu-"
 export CC="aarch64-linux-gnu-gcc"
 if [[ ${USE_CCACHE} == true ]]; then
+    export CROSS_COMPILE="ccache aarch64-linux-gnu-"
     export CC="ccache aarch64-linux-gnu-gcc"
 fi
 
