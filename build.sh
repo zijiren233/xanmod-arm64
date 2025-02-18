@@ -56,11 +56,7 @@ tar -zxf "linux-${XANMODVER}.tar.gz" \
     --strip-components=1
 cd "linux-${XANMODVER}-kernel"
 
-if [[ ${XANMODVER} =~ -rt ]]; then
-    cp ../configs/config-6.9.7+bpo-rt-arm64 .config
-else
-    cp ../configs/config-6.9.7+bpo-arm64 .config
-fi
+cp ../configs/config-6.12.9+bpo-arm64 .config
 
 undefine() {
     for _config_name in "$@"; do
@@ -164,7 +160,7 @@ if [[ ${USE_CCACHE} == true ]]; then
 fi
 
 MAKE="make \
--j$(nproc) \
+-j$((2*$(nproc))) \
 ARCH=arm64 \
 INSTALL_PATH=$INSTALL_DIR/boot \
 INSTALL_MOD_PATH=$INSTALL_DIR \
