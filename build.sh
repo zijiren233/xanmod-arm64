@@ -56,7 +56,7 @@ tar -zxf "linux-${XANMODVER}.tar.gz" \
     --strip-components=1
 cd "linux-${XANMODVER}-kernel"
 
-cp ../configs/config-6.12.9+bpo-arm64 .config
+cp ../configs/config-6.12.12+bpo-arm64 .config
 
 undefine() {
     for _config_name in "$@"; do
