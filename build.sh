@@ -2,48 +2,50 @@
 set -e
 
 for i in "$@"; do
-    case ${i,,} in
-    --version=*)
-        XANMODVER="${i#*=}"
-        shift
-        ;;
-    --version)
-        echo "Please use '--${i#--}=' to assign value to option"
-        exit 1
-        ;;
-    --ccache)
-        USE_CCACHE=true
-        export KBUILD_BUILD_TIMESTAMP=''
-        shift
-        ;;
-    -*)
-        echo "Unknown option $i"
-        exit 1
-        ;;
-    *) ;;
-    esac
+	case ${i,,} in
+	--version=*)
+		XANMODVER="${i#*=}"
+		shift
+		;;
+	--version)
+		echo "Please use '--${i#--}=' to assign value to option"
+		exit 1
+		;;
+	--ccache)
+		USE_CCACHE=true
+		export KBUILD_BUILD_TIMESTAMP=''
+		shift
+		;;
+	-*)
+		echo "Unknown option $i"
+		exit 1
+		;;
+	*) ;;
+	esac
 done
 
 if [[ ! ${XANMODVER} =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9]+)*-xanmod[0-9]+$ ]]; then
-    echo "XANMODVER is not in format 'x.y.z(-something)-xanmodN'"
-    exit 1
+	echo "XANMODVER is not in format 'x.y.z(-something)-xanmodN'"
+	exit 1
 fi
 
 echo "xanmod version: ${XANMODVER}"
 
 dpkg --add-architecture arm64
 
-apt update &&
-    apt install -y wget make \
-        flex bison libncurses-dev perl libssl-dev:arm64 \
-        libelf-dev:arm64 libelf-dev:native libssl-dev:native build-essential lsb-release \
-        bc debhelper rsync kmod cpio debhelper-compat gcc-aarch64-linux-gnu libdw-dev:native
+apt update
+
+apt install -y wget make \
+	flex bison libncurses-dev perl libssl-dev:arm64 \
+	libelf-dev:arm64 libelf-dev:native libssl-dev:native build-essential lsb-release \
+	bc debhelper rsync kmod cpio debhelper-compat gcc-aarch64-linux-gnu libdw-dev:native
+
 . "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
-    # export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
-    # export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
-    curl https://sh.rustup.rs -sSf | bash -s -- -y
-    . "$HOME/.cargo/env"
+	# export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
+	# export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
+	curl https://sh.rustup.rs -sSf | bash -s -- -y
+	. "$HOME/.cargo/env"
 fi
 rustup default stable
 
@@ -52,34 +54,34 @@ wget "https://gitlab.com/xanmod/linux/-/archive/${XANMODVER}/linux-${XANMODVER}.
 mkdir -p "linux-${XANMODVER}-kernel"
 rm -rf "linux-${XANMODVER}-kernel/*"
 tar -zxf "linux-${XANMODVER}.tar.gz" \
-    -C "linux-${XANMODVER}-kernel" \
-    --strip-components=1
+	-C "linux-${XANMODVER}-kernel" \
+	--strip-components=1
 cd "linux-${XANMODVER}-kernel"
 
-cp ../configs/config-6.12.30+bpo-arm64 .config
+cp ../configs/config-6.12.43+deb12-arm64 .config
 
 undefine() {
-    for _config_name in "$@"; do
-        scripts/config -k --undefine "${_config_name}"
-    done
+	for _config_name in "$@"; do
+		scripts/config -k --undefine "${_config_name}"
+	done
 }
 
 enable() {
-    for _config_name in "$@"; do
-        scripts/config -k --enable "${_config_name}"
-    done
+	for _config_name in "$@"; do
+		scripts/config -k --enable "${_config_name}"
+	done
 }
 
 disable() {
-    for _config_name in "$@"; do
-        scripts/config -k --disable "${_config_name}"
-    done
+	for _config_name in "$@"; do
+		scripts/config -k --disable "${_config_name}"
+	done
 }
 
 module() {
-    for _config_name in "$@"; do
-        scripts/config -k --module "${_config_name}"
-    done
+	for _config_name in "$@"; do
+		scripts/config -k --module "${_config_name}"
+	done
 }
 
 # debug
@@ -132,9 +134,9 @@ disable MODULE_SIG_SHA512
 enable "TCP_CONG_ADVANCED"
 _tcp_cong_alg_list=("yeah" "bbr" "cubic" "vegas" "westwood" "reno")
 for _alg in "${_tcp_cong_alg_list[@]}"; do
-    _alg_upper=$(echo "$_alg" | tr '[a-z]' '[A-Z]')
-    enable "TCP_CONG_${_alg_upper}"
-    disable "DEFAULT_${_alg_upper}"
+	_alg_upper=$(echo "$_alg" | tr '[a-z]' '[A-Z]')
+	enable "TCP_CONG_${_alg_upper}"
+	disable "DEFAULT_${_alg_upper}"
 done
 enable "DEFAULT_BBR"
 scripts/config --set-str "DEFAULT_TCP_CONG" "bbr"
@@ -155,12 +157,12 @@ rm -rf ${PKGS_DIR}/*
 export CROSS_COMPILE="aarch64-linux-gnu-"
 export CC="aarch64-linux-gnu-gcc"
 if [[ ${USE_CCACHE} == true ]]; then
-    export CROSS_COMPILE="ccache aarch64-linux-gnu-"
-    export CC="ccache aarch64-linux-gnu-gcc"
+	export CROSS_COMPILE="ccache aarch64-linux-gnu-"
+	export CC="ccache aarch64-linux-gnu-gcc"
 fi
 
 MAKE="make \
--j$((2 * $(nproc))) \
+-j$(nproc) \
 ARCH=arm64 \
 INSTALL_PATH=$INSTALL_DIR/boot \
 INSTALL_MOD_PATH=$INSTALL_DIR \
