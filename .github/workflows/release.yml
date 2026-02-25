@@ -36,21 +36,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Get Release Body from Xanmod
-        id: get_xanmod_release_body
-        run: |
-          curl -sL "https://api.github.com/repos/xanmod/linux/releases/tags/${{ inputs.version }}" -H "Accept: application/vnd.github.html+json" | jq -r '.body_html' > body-${{ inputs.version }}.html
-
-      - name: Truncate Release Body if Too Long
-        id: truncate_release_body
-        run: |
-          BODY_LENGTH=$(wc -c < body-${{ inputs.version }}.html)
-          if [[ $BODY_LENGTH -gt 125000 ]]; then
-            head -c 125000 body-${{ inputs.version }}.html > truncated-body-${{ inputs.version }}.html
-            echo "::warning:: Release body truncated to 125000 characters."
-            mv truncated-body-${{ inputs.version }}.html body-${{ inputs.version }}.html
-          fi
-
       - name: setup deb822 repos
         run: |
           if [[ $ImageOS == "ubuntu24" ]]; then
@@ -128,16 +113,17 @@ jobs:
             --version=${{ inputs.version }}
 
       - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-          append_body: false
-          fail_on_unmatched_files: true
-          name: "Version ${{ inputs.version }}"
-          tag_name: "${{ inputs.version }}"
-          make_latest: ${{ inputs.latest }}
-          body_path: body-${{ inputs.version }}.html
-          files: |
-            linux-${{ inputs.version }}-kernel/pkgs/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest_flag="--latest=false"
+          if [[ "${{ inputs.latest }}" == "true" ]]; then
+            latest_flag="--latest"
+          fi
+
+          gh release create "${{ inputs.version }}" \
+            --title "Version ${{ inputs.version }}" \
+            --fail-on-unmatched-files \
+            $latest_flag \
+            linux-${{ inputs.version }}-kernel/pkgs/* \
             linux-${{ inputs.version }}.tar.gz
