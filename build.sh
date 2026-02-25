@@ -31,14 +31,12 @@ fi
 
 echo "xanmod version: ${XANMODVER}"
 
-dpkg --add-architecture arm64
-
 apt update
 
-apt install -y wget make \
-	flex bison libncurses-dev perl libssl-dev:arm64 \
-	libelf-dev:arm64 libelf-dev:native libssl-dev:native build-essential lsb-release \
-	bc debhelper rsync kmod cpio debhelper-compat gcc-aarch64-linux-gnu libdw-dev:native
+apt install -y wget make gcc \
+	flex bison libncurses-dev perl libssl-dev \
+	libelf-dev libelf-dev libssl-dev build-essential lsb-release \
+	bc debhelper rsync kmod cpio debhelper-compat libdw-dev
 
 . "$HOME/.cargo/env" || true
 if ! command -v rustup >/dev/null 2>&1; then
