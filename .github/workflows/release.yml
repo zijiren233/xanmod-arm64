@@ -52,7 +52,6 @@ jobs:
 
           gh release create "${{ inputs.version }}" \
             --title "Version ${{ inputs.version }}" \
-            --fail-on-unmatched-files \
             $latest_flag \
             linux-${{ inputs.version }}-kernel/pkgs/* \
             linux-${{ inputs.version }}.tar.gz
